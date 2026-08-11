@@ -181,9 +181,29 @@ void MainWindow::setupGStreamer() {
 
     for (int i = 0; i < kChannelCount; i++) {
         pipelineStr += QString(
-            "uridecodebin name=src_%1 ! queue max-size-buffers=3 ! tee name=t_%1 "
-            "t_%1. ! queue max-size-buffers=3 ! deinterlace ! interlace field-pattern=1:1 top-field-first=true ! videoconvert ! video/x-raw,format=UYVY,interlace-mode=interleaved,field-order=top-field-first ! decklinkvideosink device-number=%1 mode=1080i50 "
-            "t_%1. ! queue max-size-buffers=3 ! deinterlace ! videoconvert ! video/x-raw,format=BGRA,interlace-mode=progressive ! d3d11videosink name=gui_sink_%1 sync=false "
+            "uridecodebin name=src_%1 !"
+            // " queue max-size-buffers=3 !"
+            " tee name=t_%1"
+            
+            // " t_%1. ! queue max-size-time=2000000000 max-size-buffers=0 max-size-bytes=0 !"
+            // " videoconvert name=decklink_conv_%1 !"
+            // " video/x-raw,format=UYVY,width=1920,height=1080,interlace-mode=interlaced !"
+            // " decklinkvideosink device-number=%1 sync=true qos=true "
+
+
+            " t_%1. ! queue max-size-buffers=1 max-size-time=0 !"
+            " deinterlace method=linear !"
+            "videorate !"
+            " videoconvert !"
+            " video/x-raw,format=UYVY,width=1920,height=1080,framerate=25/1,interlace-mode=progressive !"
+            " decklinkvideosink device-number=%1 mode=1080p25 sync=true qos=true "
+
+
+            "t_%1. ! queue max-size-buffers=3 leaky=downstream !"
+            " deinterlace !"
+            " videoconvert !"
+            " video/x-raw,format=BGRA,interlace-mode=progressive !"
+            " d3d11videosink name=gui_sink_%1 sync=false "
         ).arg(i);
     }
 
