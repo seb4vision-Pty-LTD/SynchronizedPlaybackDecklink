@@ -1,0 +1,20 @@
+================================================================================
+Linker Errors
+Generated: 2026-08-11T13:15:29.351Z
+Total Errors: 5
+================================================================================
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: virtual struct QMetaObject const * __cdecl MainWindow::metaObject(void)const " (?metaObject@MainWindow@@UEBAPEBUQMetaObject@@XZ) [C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.vcxproj]
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: virtual void * __cdecl MainWindow::qt_metacast(char const *)" (?qt_metacast@MainWindow@@UEAAPEAXPEBD@Z) [C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.vcxproj]
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: virtual int __cdecl MainWindow::qt_metacall(enum QMetaObject::Call,int,void * *)" (?qt_metacall@MainWindow@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z) [C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.vcxproj]
+
+[LNK2001] (MSVC)
+unresolved external symbol "public: static struct QMetaObject const MainWindow::staticMetaObject" (?staticMetaObject@MainWindow@@2UQMetaObject@@B) [C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.vcxproj]
+
+[LNK1120] (MSVC)
+4 unresolved externals [C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.vcxproj]

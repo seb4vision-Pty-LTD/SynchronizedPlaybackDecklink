@@ -1,0 +1,10 @@
+^C:\USERS\SIPHO-MANCAM\DOCUMENTS\PROGRAMMING\CPP\SYNCEDPLAYBACKDECKLINK\BUILD\CMAKEFILES\F94CDDC02B206A11DDFF304BF5DD648A\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink -BC:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/build/DecklinkPlayout.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

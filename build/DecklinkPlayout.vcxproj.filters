@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout_autogen\mocs_compilation_Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\src\MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout_autogen\mocs_compilation_MinSizeRel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\include\MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{21277ACE-917E-3D71-AA1F-EE0DE7E35BAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{BED3F7D4-F93C-3963-94BE-1044EB46A97D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

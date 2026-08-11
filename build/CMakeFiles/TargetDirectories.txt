@@ -1,0 +1,3 @@
+C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/build/CMakeFiles/DecklinkPlayout.dir
+C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/build/CMakeFiles/ZERO_CHECK.dir

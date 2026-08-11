@@ -1,0 +1,7 @@
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\gobject-2.0-0.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\glib-2.0-0.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\iconv-2.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\intl-8.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\pcre2-8.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\Debug\ffi-8.dll
+C:\Users\sipho-mancam\Documents\Programming\cpp\SyncedPlaybackDecklink\build\DecklinkPlayout.dir\Debug\Decklink.63AB5685.Up2Date
