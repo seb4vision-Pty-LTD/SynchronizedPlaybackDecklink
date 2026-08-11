@@ -256,6 +256,7 @@ C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/include/M
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qhashfunctions.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qiodevice.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qiodevicebase.h
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qitemselectionmodel.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qiterable.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qiterator.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtCore/qlatin1stringview.h
@@ -373,17 +374,22 @@ C:/Users/sipho-mancam/Documents/Programming/cpp/SyncedPlaybackDecklink/include/M
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QComboBox
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QLabel
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QLineEdit
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QListWidget
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QMainWindow
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QPushButton
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/QSlider
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractbutton.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractitemdelegate.h
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractitemview.h
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractscrollarea.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractslider.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qabstractspinbox.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qcombobox.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qframe.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qlabel.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qlineedit.h
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qlistview.h
+ mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qlistwidget.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qmainwindow.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qpushbutton.h
  mdp:C:/Qt/6.11.1/msvc2022_64/include/QtWidgets/qrubberband.h

@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QTimer>
 #include <QDir>
+#include <QListWidget>
 #include <gst/gst.h>
 
 class MainWindow : public QMainWindow {
@@ -20,9 +21,15 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void onSelectRootDirectory();
-    void onPlaylistChanged(const QString &dirName);
+    void onSessionSelected(QListWidgetItem *item);
+    void onPlaylistSelected(QListWidgetItem *item);
+    void onNextPlaylist();
+    void onPreviousPlaylist();
     void onStartClicked();
     void onPlayPauseClicked();
     void onSeekSliderMoved(int position);
@@ -32,13 +39,18 @@ private slots:
 private:
     void setupUI();
     void setupGStreamer();
-    void loadPlaylists(const QString &rootDir);
+    void loadSessions(const QString &rootDir);
+    void loadPlaylistsForSession(const QString &sessionPath);
+    void loadCurrentPlaylist();
     void setWindowHandles();
 
     // UI Elements
     QLineEdit *rootDirEdit;
     QPushButton *selectRootBtn;
-    QComboBox *playlistCombo;
+    QListWidget *sessionList;
+    QListWidget *playlistList;
+    QPushButton *nextPlaylistBtn;
+    QPushButton *previousPlaylistBtn;
     QPushButton *startBtn;
     QPushButton *playPauseBtn;
     QSlider *seekSlider;
@@ -54,6 +66,7 @@ private:
     gint64 duration;
     bool isPlaying;
     QString currentRootDir;
+    QString currentSessionPath;
 };
 
 #endif // MAINWINDOW_H

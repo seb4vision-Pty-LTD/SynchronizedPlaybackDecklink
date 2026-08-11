@@ -11,10 +11,12 @@
 #include <QDebug>
 #include <QStatusBar>
 #include <QByteArray>
+#include <QKeyEvent>
+#include <QListWidget>
 #include <gst/video/videooverlay.h>
 
 MainWindow::MainWindow(QWidget *parent) 
-    : QMainWindow(parent), updateTimer(nullptr), busTimer(nullptr), pipeline(nullptr), bus(nullptr), duration(-1), isPlaying(false)
+    : QMainWindow(parent), updateTimer(nullptr), busTimer(nullptr), pipeline(nullptr), bus(nullptr), duration(-1), isPlaying(false), currentSessionPath("")
 {
     for (int i = 0; i < kChannelCount; i++) {
         videoWidgets[i] = nullptr;
@@ -37,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     const QString preferredRootDir = "C:/Users/sipho-mancam/Videos/Playlists";
     currentRootDir = QDir(preferredRootDir).exists() ? preferredRootDir : QDir::homePath();
     rootDirEdit->setText(currentRootDir);
-    loadPlaylists(currentRootDir);
+    loadSessions(currentRootDir);
 }
 
 MainWindow::~MainWindow() {
@@ -85,10 +87,34 @@ void MainWindow::setupUI() {
     rootLayout->addWidget(selectRootBtn);
     layout->addLayout(rootLayout);
 
-    playlistCombo = new QComboBox(this);
-    connect(playlistCombo, &QComboBox::currentTextChanged, this, &MainWindow::onPlaylistChanged);
+    layout->addWidget(new QLabel("Select Session:"));
+    sessionList = new QListWidget(this);
+    connect(sessionList, &QListWidget::itemSelectionChanged, this, [this]() {
+        if (sessionList->currentItem()) {
+            onSessionSelected(sessionList->currentItem());
+        }
+    });
+    layout->addWidget(sessionList);
+
     layout->addWidget(new QLabel("Select Playlist:"));
-    layout->addWidget(playlistCombo);
+    playlistList = new QListWidget(this);
+    connect(playlistList, &QListWidget::itemSelectionChanged, this, [this]() {
+        if (playlistList->currentItem()) {
+            onPlaylistSelected(playlistList->currentItem());
+        }
+    });
+    layout->addWidget(playlistList);
+
+    QHBoxLayout *navLayout = new QHBoxLayout();
+    previousPlaylistBtn = new QPushButton("Previous (A)", this);
+    connect(previousPlaylistBtn, &QPushButton::clicked, this, &MainWindow::onPreviousPlaylist);
+    navLayout->addWidget(previousPlaylistBtn);
+
+    nextPlaylistBtn = new QPushButton("Next (Z)", this);
+    connect(nextPlaylistBtn, &QPushButton::clicked, this, &MainWindow::onNextPlaylist);
+    navLayout->addWidget(nextPlaylistBtn);
+    
+    layout->addLayout(navLayout);
 
     startBtn = new QPushButton("Start", this);
     connect(startBtn, &QPushButton::clicked, this, &MainWindow::onStartClicked);
@@ -171,7 +197,7 @@ void MainWindow::onSelectRootDirectory() {
 
     currentRootDir = selectedDir;
     rootDirEdit->setText(currentRootDir);
-    loadPlaylists(currentRootDir);
+    loadSessions(currentRootDir);
 }
 
 void MainWindow::setupGStreamer() {
@@ -248,18 +274,59 @@ void MainWindow::setWindowHandles() {
     }
 }
 
-void MainWindow::loadPlaylists(const QString &rootDir) {
+void MainWindow::loadSessions(const QString &rootDir) {
     QDir dir(rootDir);
-    playlistCombo->clear();
+    sessionList->clear();
+    playlistList->clear();
+    currentSessionPath = "";
     if (!dir.exists()) {
         return;
     }
 
     QStringList directories = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    playlistCombo->addItems(directories);
+    sessionList->addItems(directories);
 }
 
-void MainWindow::onPlaylistChanged(const QString &dirName) {
+void MainWindow::loadPlaylistsForSession(const QString &sessionPath) {
+    QDir sessionDir(sessionPath);
+    playlistList->clear();
+    currentSessionPath = sessionPath;
+    
+    if (!sessionDir.exists()) {
+        qWarning() << "Session directory does not exist:" << sessionPath;
+        return;
+    }
+
+    // Load playlist directories (subdirectories within the session)
+    QStringList playlistDirs = sessionDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    
+    if (playlistDirs.isEmpty()) {
+        qWarning() << "No playlist directories found in session:" << sessionPath;
+        return;
+    }
+
+    playlistList->addItems(playlistDirs);
+}
+
+void MainWindow::onSessionSelected(QListWidgetItem *item) {
+    if (!item) {
+        return;
+    }
+
+    QString sessionName = item->text();
+    QString sessionPath = currentRootDir + "/" + sessionName;
+    loadPlaylistsForSession(sessionPath);
+}
+
+void MainWindow::onPlaylistSelected(QListWidgetItem *item) {
+    if (!item) {
+        return;
+    }
+
+    loadCurrentPlaylist();
+}
+
+void MainWindow::loadCurrentPlaylist() {
     // Rebuild the playback graph for every playlist switch to avoid stale uridecodebin links.
     if (pipeline) {
         gst_element_set_state(pipeline, GST_STATE_NULL);
@@ -279,12 +346,26 @@ void MainWindow::onPlaylistChanged(const QString &dirName) {
         updateTimer->stop();
     }
 
-    QDir playlistDir(currentRootDir + "/" + dirName);
+    if (currentSessionPath.isEmpty() || !playlistList->currentItem()) {
+        return;
+    }
+
+    // Get the current playlist folder name
+    QString playlistFolderName = playlistList->currentItem()->text();
+    QString playlistPath = currentSessionPath + "/" + playlistFolderName;
+    
+    QDir playlistDir(playlistPath);
+    if (!playlistDir.exists()) {
+        qWarning() << "Playlist directory does not exist:" << playlistPath;
+        return;
+    }
+
     QStringList filters;
     filters << "*.mp4";
     QFileInfoList files = playlistDir.entryInfoList(filters, QDir::Files, QDir::Name);
+    
     if (files.isEmpty()) {
-        qWarning() << "No .mp4 files found in playlist:" << playlistDir.absolutePath();
+        qWarning() << "No .mp4 files found in playlist:" << playlistPath;
         return;
     }
 
@@ -321,6 +402,35 @@ void MainWindow::onPlaylistChanged(const QString &dirName) {
     duration = -1;
     isPlaying = false;
     playPauseBtn->setText("Play");
+}
+
+void MainWindow::onNextPlaylist() {
+    if (playlistList->count() > 0) {
+        int nextIndex = (playlistList->row(playlistList->currentItem()) + 1) % playlistList->count();
+        playlistList->setCurrentRow(nextIndex);
+    }
+}
+
+void MainWindow::onPreviousPlaylist() {
+    if (playlistList->count() > 0) {
+        int prevIndex = (playlistList->row(playlistList->currentItem()) - 1 + playlistList->count()) % playlistList->count();
+        playlistList->setCurrentRow(prevIndex);
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    if (!event->isAutoRepeat()) {
+        if (event->key() == Qt::Key_Z) {
+            onNextPlaylist();
+            event->accept();
+            return;
+        } else if (event->key() == Qt::Key_A) {
+            onPreviousPlaylist();
+            event->accept();
+            return;
+        }
+    }
+    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::onPlayPauseClicked() {
