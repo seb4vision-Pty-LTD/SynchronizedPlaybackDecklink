@@ -182,8 +182,8 @@ void MainWindow::setupGStreamer() {
     for (int i = 0; i < kChannelCount; i++) {
         pipelineStr += QString(
             "uridecodebin name=src_%1 ! queue max-size-buffers=3 ! tee name=t_%1 "
-            "t_%1. ! queue max-size-buffers=3 ! videoconvert ! video/x-raw,format=UYVY,interlace-mode=interleaved ! decklinkvideosink device-number=%1 mode=1080i50 "
-            "t_%1. ! queue max-size-buffers=3 ! deinterlace ! videoconvert ! video/x-raw,format=BGRA ! d3d11videosink name=gui_sink_%1 sync=false "
+            "t_%1. ! queue max-size-buffers=3 ! deinterlace ! interlace field-pattern=1:1 top-field-first=true ! videoconvert ! video/x-raw,format=UYVY,interlace-mode=interleaved,field-order=top-field-first ! decklinkvideosink device-number=%1 mode=1080i50 "
+            "t_%1. ! queue max-size-buffers=3 ! deinterlace ! videoconvert ! video/x-raw,format=BGRA,interlace-mode=progressive ! d3d11videosink name=gui_sink_%1 sync=false "
         ).arg(i);
     }
 
