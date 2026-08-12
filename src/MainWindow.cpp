@@ -15,6 +15,30 @@
 #include <QListWidget>
 #include <gst/video/videooverlay.h>
 
+namespace {
+
+void logPadCaps(const char *label, GstPad *pad) {
+    GstCaps *currentCaps = gst_pad_get_current_caps(pad);
+    GstCaps *queryCaps = gst_pad_query_caps(pad, nullptr);
+    gchar *currentText = currentCaps ? gst_caps_to_string(currentCaps) : g_strdup("<not negotiated>");
+    gchar *queryText = queryCaps ? gst_caps_to_string(queryCaps) : g_strdup("<none>");
+
+    qInfo().noquote() << label << GST_PAD_NAME(pad)
+                      << "current:" << currentText
+                      << "query:" << queryText;
+
+    g_free(currentText);
+    g_free(queryText);
+    if (currentCaps) {
+        gst_caps_unref(currentCaps);
+    }
+    if (queryCaps) {
+        gst_caps_unref(queryCaps);
+    }
+}
+
+}
+
 MainWindow::MainWindow(QWidget *parent) 
     : QMainWindow(parent), updateTimer(nullptr), busTimer(nullptr), pipeline(nullptr), bus(nullptr), duration(-1), isPlaying(false), currentSessionPath("")
 {
@@ -36,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupGStreamer();
     setWindowState(windowState() | Qt::WindowMaximized);
     
-    const QString preferredRootDir = "C:/Users/sipho-mancam/Videos/Playlists";
+    const QString preferredRootDir = "C:/Users/sipho-mancam/Videos/Root";
     currentRootDir = QDir(preferredRootDir).exists() ? preferredRootDir : QDir::homePath();
     rootDirEdit->setText(currentRootDir);
     loadSessions(currentRootDir);
@@ -202,26 +226,21 @@ void MainWindow::onSelectRootDirectory() {
 
 void MainWindow::setupGStreamer() {
     // We construct a single pipeline string containing 8 parallel branches.
-    // uridecodebin allows direct URI assignment for each channel source.
+    // Use an explicit file source and H.264 decode chain for each channel.
     QString pipelineStr;
 
     for (int i = 0; i < kChannelCount; i++) {
         pipelineStr += QString(
-            "uridecodebin name=src_%1 !"
+            "filesrc name=file_src_%1 location=\"\" !"
+            " qtdemux name=demux_%1"
+            " demux_%1.video_0 ! h264parse ! avdec_h264 !"
             " tee name=t_%1"
-          
-            " t_%1. ! queue max-size-buffers=1 max-size-time=0 !"
-            " deinterlace method=linear !"
-            "videorate !"
+            " t_%1. ! queue max-size-buffers=2 max-size-time=0 !"
+            " videoconvert ! d3d11videosink name=gui_sink_%1 sync=false qos=false"
+            " t_%1. ! queue max-size-buffers=2 max-size-time=0 !"
             " videoconvert !"
-            " video/x-raw,format=UYVY,width=1920,height=1080,framerate=25/1,interlace-mode=progressive !"
-            " decklinkvideosink device-number=%1 mode=1080p25 sync=true qos=true "
-
-            "t_%1. ! queue max-size-buffers=3 leaky=downstream !"
-            " deinterlace !"
-            " videoconvert !"
-            " video/x-raw,format=BGRA,interlace-mode=progressive !"
-            " d3d11videosink name=gui_sink_%1 sync=false "
+            " video/x-raw,format=UYVY,width=1920,height=1080,framerate=25/1,interlace-mode=interleaved,field-order=top-field-first !"
+            " decklinkvideosink name=decklink_sink_%1 device-number=%1 mode=1080i50 sync=true qos=true "
         ).arg(i);
     }
 
@@ -238,12 +257,21 @@ void MainWindow::setupGStreamer() {
         return;
     }
 
-    // Extract uridecodebin elements to set channel URIs later.
+    // Extract file sources to set channel locations later.
     for (int i = 0; i < kChannelCount; i++) {
-        QString srcName = QString("src_%1").arg(i);
+        QString srcName = QString("file_src_%1").arg(i);
         fileSrcs[i] = gst_bin_get_by_name(GST_BIN(pipeline), srcName.toUtf8().constData());
-        if (fileSrcs[i]) {
-            g_object_set(fileSrcs[i], "expose-all-streams", FALSE, nullptr);
+
+        GstElement *sink = gst_bin_get_by_name(GST_BIN(pipeline),
+                                               QString("decklink_sink_%1").arg(i).toUtf8().constData());
+        if (sink) {
+            GstPad *sinkPad = gst_element_get_static_pad(sink, "sink");
+            if (sinkPad) {
+                gst_pad_add_probe(sinkPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM,
+                                  &MainWindow::logCapsEvent, this, nullptr);
+                gst_object_unref(sinkPad);
+            }
+            gst_object_unref(sink);
         }
     }
 
@@ -253,6 +281,26 @@ void MainWindow::setupGStreamer() {
     }
 
     bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
+}
+
+void MainWindow::onDecodedPadAdded(GstElement *decodebin, GstPad *pad) {
+    qInfo() << "uridecodebin" << GST_ELEMENT_NAME(decodebin) << "added pad" << GST_PAD_NAME(pad);
+    logPadCaps("uridecodebin caps:", pad);
+}
+
+GstPadProbeReturn MainWindow::logCapsEvent(GstPad *pad, GstPadProbeInfo *info, gpointer) {
+    if ((GST_PAD_PROBE_INFO_TYPE(info) & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM) != 0) {
+        GstEvent *event = GST_PAD_PROBE_INFO_EVENT(info);
+        if (GST_EVENT_TYPE(event) == GST_EVENT_CAPS) {
+            GstCaps *caps = nullptr;
+            gst_event_parse_caps(event, &caps);
+            gchar *capsText = gst_caps_to_string(caps);
+            qInfo().noquote() << "decklinkvideosink" << GST_PAD_NAME(pad)
+                              << "received caps:" << capsText;
+            g_free(capsText);
+        }
+    }
+    return GST_PAD_PROBE_OK;
 }
 
 void MainWindow::setWindowHandles() {
@@ -374,21 +422,7 @@ void MainWindow::loadCurrentPlaylist() {
         if (fileSrcs[i]) {
             const int fileIndex = i < files.size() ? i : files.size() - 1;
             const QString absPath = files[fileIndex].absoluteFilePath();
-            const QByteArray nativePath = QDir::toNativeSeparators(absPath).toUtf8();
-            GError *uriError = nullptr;
-            gchar *uri = gst_filename_to_uri(nativePath.constData(), &uriError);
-
-            if (!uri) {
-                qWarning() << "Failed to convert file path to URI:" << absPath;
-                if (uriError) {
-                    qWarning() << "URI conversion error:" << uriError->message;
-                    g_clear_error(&uriError);
-                }
-                continue;
-            }
-
-            g_object_set(fileSrcs[i], "uri", uri, nullptr);
-            g_free(uri);
+            g_object_set(fileSrcs[i], "location", absPath.toUtf8().constData(), nullptr);
         }
     }
 
@@ -513,13 +547,9 @@ void MainWindow::processBusMessages() {
     }
 
     GstMessage *msg = nullptr;
-    const GstMessageType types = static_cast<GstMessageType>(
-        GST_MESSAGE_ERROR |
-        GST_MESSAGE_EOS |
-        GST_MESSAGE_WARNING
-    );
 
-    while ((msg = gst_bus_pop_filtered(bus, types)) != nullptr) {
+    // Drain all messages; unhandled types are discarded to prevent queue overflow.
+    while ((msg = gst_bus_pop(bus)) != nullptr) {
         switch (GST_MESSAGE_TYPE(msg)) {
             case GST_MESSAGE_EOS:
                 playPauseBtn->setText("Play");

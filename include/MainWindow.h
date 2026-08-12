@@ -43,6 +43,8 @@ private:
     void loadPlaylistsForSession(const QString &sessionPath);
     void loadCurrentPlaylist();
     void setWindowHandles();
+    void onDecodedPadAdded(GstElement *decodebin, GstPad *pad);
+    static GstPadProbeReturn logCapsEvent(GstPad *pad, GstPadProbeInfo *info, gpointer userData);
 
     // UI Elements
     QLineEdit *rootDirEdit;
