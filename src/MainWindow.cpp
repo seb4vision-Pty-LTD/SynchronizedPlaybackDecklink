@@ -428,6 +428,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             onPreviousPlaylist();
             event->accept();
             return;
+        } else if (event->key() == Qt::Key_Space) {
+            onPlayPauseClicked();
+            event->accept();
+            return;
         }
     }
     QMainWindow::keyPressEvent(event);
