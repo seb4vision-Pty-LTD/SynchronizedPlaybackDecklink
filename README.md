@@ -46,6 +46,13 @@ Root Dir/
 | Device 7        | Channel 7 |
 | Device 8        | Channel 8 |
 
+
+# Support input modes
+> Video files must be mp4 (25 fps (interlaced/mixed))
+
+> **Decklink output**: 1080p25
+
+
 ## Notes
 
 > **Driver Required:** The application requires Decklink drivers to be installed — they are not bundled with the application.
