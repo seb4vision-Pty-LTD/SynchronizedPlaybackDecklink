@@ -1,48 +1,53 @@
-SYNCEDPLAYBACKDECKLINK
+# SyncedPlaybackDecklink
 
-This project plays back 8 video files on a decklink quad card.
-On the Interface, the user must select the root directory containing sessions.
+This project plays back 8 video files on a Decklink quad card.
+On the interface, the user must select the root directory containing sessions.
 
-The Folder structure must be as follows:
+## Folder Structure
 
+```
 Root Dir/
-    |---Session 1/
-        |---Playlist 1/
-            |---Video1.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-    |---Session 2/
-        |---Playlist 1/
-            |---Video1.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
-            |---Video2.mp4
+├── Session 1/
+│   └── Playlist 1/
+│       ├── Video1.mp4
+│       ├── Video2.mp4
+│       ├── Video3.mp4
+│       ├── Video4.mp4
+│       ├── Video5.mp4
+│       └── Video6.mp4
+└── Session 2/
+    └── Playlist 1/
+        ├── Video1.mp4
+        ├── Video2.mp4
+        ├── Video3.mp4
+        ├── Video4.mp4
+        ├── Video5.mp4
+        └── Video6.mp4
+```
 
+## Controls
 
-Controls:
-    Keyboard Keys:
-        A - Previous
-        Z - Next
-        Space - Pause/Play
+| Key     | Action      |
+|---------|-------------|
+| `A`     | Previous    |
+| `Z`     | Next        |
+| `Space` | Pause/Play  |
 
-Channel Mapping:
-    Decklink Device 1 = Channel 1
-    Decklink Device 2 = Channel 2
-    Decklink Device 3 = Channel 3
-    Decklink Device 4 = Channel 4
-    Decklink Device 5 = Channel 5
-    Decklink Device 6 = Channel 6
-    Decklink Device 7 = Channel 7
-    Decklink Device 8 = Channel 8
+## Channel Mapping
 
+| Decklink Device | Channel   |
+|-----------------|-----------|
+| Device 1        | Channel 1 |
+| Device 2        | Channel 2 |
+| Device 3        | Channel 3 |
+| Device 4        | Channel 4 |
+| Device 5        | Channel 5 |
+| Device 6        | Channel 6 |
+| Device 7        | Channel 7 |
+| Device 8        | Channel 8 |
 
-Note: The application Requires that there be decklink drivers installed as it does not
-come with the driver pre-packaged. 
+## Notes
 
-Note: The decklink devices must be set to Half-duplex mode (SDI1->Device 1)
-and not full-duplex mode (SDI10>Device1&Device2)
+> **Driver Required:** The application requires Decklink drivers to be installed — they are not bundled with the application.
+
+> **Device Mode:** Decklink devices must be set to **Half-duplex** mode (`SDI1 → Device 1`), not full-duplex mode (`SDI1 → Device 1 & Device 2`).
